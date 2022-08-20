@@ -13,7 +13,6 @@
 # limitations under the License.
 
 
-from types import NoneType
 from typing import Callable, Generic, List, Optional
 
 from prezzemolo.binary_tree import KeyType, Node, ValueType
@@ -70,12 +69,12 @@ class AVLTree(Generic[KeyType, ValueType]):
             current_key: KeyType = current_node.key
             try:
                 if current_key > key:
-                    if not isinstance(current_node.left, (NoneType, AVLNode)):
+                    if current_node.left and not isinstance(current_node.left, AVLNode):
                         raise AssertionError(f"AVL tree contains a non-AVL node: {current_node.left}")
                     current_node = current_node.left
                 elif current_key < key:
                     result = current_node
-                    if not isinstance(current_node.right, (NoneType, AVLNode)):
+                    if current_node.right and not isinstance(current_node.right, AVLNode):
                         raise AssertionError(f"AVL tree contains a non-AVL node: {current_node.right}")
                     current_node = current_node.right
                 elif current_key == key:
@@ -89,9 +88,9 @@ class AVLTree(Generic[KeyType, ValueType]):
         if not root:
             return AVLNode(key, value)
 
-        if not isinstance(root.left, (NoneType, AVLNode)):
+        if root.left and not isinstance(root.left, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if not isinstance(root.right, (NoneType, AVLNode)):
+        if root.right and not isinstance(root.right, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
 
         if key < root.key:
@@ -121,9 +120,9 @@ class AVLTree(Generic[KeyType, ValueType]):
 
     # Rotation implementation based on: https://en.wikipedia.org/wiki/Tree_rotation
     def _rotate_left(self, root: AVLNode[KeyType, ValueType]) -> AVLNode[KeyType, ValueType]:
-        if not isinstance(root.left, (NoneType, AVLNode)):
+        if root.left and not isinstance(root.left, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if not isinstance(root.right, (NoneType, AVLNode)):
+        if root.right and not isinstance(root.right, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
 
         # Disable mypy on the next few lines: it complains that variables possibly being None (and therefore not having accessible
@@ -136,9 +135,9 @@ class AVLTree(Generic[KeyType, ValueType]):
         return pivot  # type: ignore
 
     def _rotate_right(self, root: AVLNode[KeyType, ValueType]) -> AVLNode[KeyType, ValueType]:
-        if not isinstance(root.left, (NoneType, AVLNode)):
+        if root.left and not isinstance(root.left, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if not isinstance(root.right, (NoneType, AVLNode)):
+        if root.right and not isinstance(root.right, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
 
         # Disable mypy on the next few lines: it complains that variables possibly being None (and therefore not having accessible
@@ -155,9 +154,9 @@ class AVLTree(Generic[KeyType, ValueType]):
         return root.height if root else 0
 
     def _get_balance_factor(self, root: AVLNode[KeyType, ValueType]) -> int:
-        if not isinstance(root.left, (NoneType, AVLNode)):
+        if root.left and not isinstance(root.left, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if not isinstance(root.right, (NoneType, AVLNode)):
+        if root.right and not isinstance(root.right, AVLNode):
             raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
         return self._get_height(root.left) - self._get_height(root.right) if root else 0
 
