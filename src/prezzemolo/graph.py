@@ -15,6 +15,7 @@
 
 from collections import deque
 from typing import Dict, Generic, Iterator, List, Optional, Set
+
 from prezzemolo.binary_tree import ValueType
 from prezzemolo.vertex import Vertex
 
@@ -60,7 +61,7 @@ class Graph(Generic[ValueType]):
         end: Optional[Vertex[ValueType]],
         vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]] = None,
     ) -> bool:
-        marked_set: Set[Vertex[ValueType]] = set()
+        marked_set = set[Vertex[ValueType]]()
         queue = deque[Vertex[ValueType]]()
         queue.append(start)
         marked_set.add(start)
