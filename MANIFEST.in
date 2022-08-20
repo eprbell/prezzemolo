@@ -1,0 +1,10 @@
+include LICENSE
+include pyproject.toml
+include setup.cfg
+include setup.py
+
+include *.md
+
+recursive-include docs *.md *.png
+recursive-include src
+recursive-include tests *.py
