@@ -61,8 +61,8 @@ class Graph(Generic[ValueType]):
         end: Optional[Vertex[ValueType]],
         vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]] = None,
     ) -> bool:
-        marked_set = set[Vertex[ValueType]]()
-        queue = deque[Vertex[ValueType]]()
+        marked_set = set()
+        queue = deque()
         queue.append(start)
         marked_set.add(start)
         if vertex_2_parent is not None:
