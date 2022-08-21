@@ -14,7 +14,12 @@
 
 
 # Parametrized and extensible method to generate string representation from classes
-from typing import List, Optional
+from datetime import datetime
+from decimal import Decimal
+from typing import List, Optional, TypeVar
+
+KeyType = TypeVar("KeyType", int, datetime, Decimal, float, str)  # pylint: disable=invalid-name
+ValueType = TypeVar("ValueType")  # pylint: disable=invalid-name
 
 
 def to_string(indent: int = 0, repr_format: bool = True, data: Optional[List[str]] = None) -> str:

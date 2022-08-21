@@ -14,7 +14,7 @@
 
 
 from typing import Callable, Dict, Generic, Iterator, List, Optional
-from prezzemolo.avl_tree import ValueType
+from prezzemolo.utility import ValueType
 
 from prezzemolo.utility import to_string
 

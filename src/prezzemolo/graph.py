@@ -16,7 +16,7 @@
 from collections import deque
 from typing import Deque, Dict, Generic, Iterator, List, Optional, Set
 
-from prezzemolo.avl_tree import ValueType
+from prezzemolo.utility import ValueType
 from prezzemolo.vertex import Vertex
 
 
