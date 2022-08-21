@@ -14,6 +14,9 @@
 
 # Prezzemolo Change Log
 
+## 0.0.3
+* Manage py.typed to setup.cfg options.package_data
+
 ## 0.0.2
 * Added py.typed
 
