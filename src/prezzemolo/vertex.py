@@ -13,11 +13,10 @@
 # limitations under the License.
 
 
-from typing import Callable, Dict, Generic, Iterator, List, Optional, TypeVar
+from typing import Callable, Dict, Generic, Iterator, List, Optional
+from prezzemolo.avl_tree import ValueType
 
 from prezzemolo.utility import to_string
-
-ValueType = TypeVar("ValueType")  # pylint: disable=invalid-name
 
 
 class Vertex(Generic[ValueType]):
