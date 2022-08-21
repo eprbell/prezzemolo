@@ -19,6 +19,7 @@ import unittest
 from prezzemolo.graph import Graph
 from prezzemolo.vertex import Vertex
 
+
 # pylint: disable=invalid-name
 class TestGraph(unittest.TestCase):
     def setUp(self) -> None:
