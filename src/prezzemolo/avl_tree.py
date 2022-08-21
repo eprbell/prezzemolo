@@ -13,14 +13,9 @@
 # limitations under the License.
 
 
-from datetime import datetime
-from decimal import Decimal
-from typing import Callable, Generic, List, Optional, TypeVar
+from typing import Callable, Generic, List, Optional
 
-from prezzemolo.utility import to_string
-
-KeyType = TypeVar("KeyType", int, datetime, Decimal, float, str)  # pylint: disable=invalid-name
-ValueType = TypeVar("ValueType")  # pylint: disable=invalid-name
+from prezzemolo.utility import KeyType, ValueType, to_string
 
 
 class AVLNode(Generic[KeyType, ValueType]):
@@ -31,12 +26,6 @@ class AVLNode(Generic[KeyType, ValueType]):
 
         self.__left: Optional[AVLNode[KeyType, ValueType]] = None
         self.__right: Optional[AVLNode[KeyType, ValueType]] = None
-
-    def __str__(self) -> str:
-        return self.to_string(indent=0, repr_format=False)
-
-    def __repr__(self) -> str:
-        return self.to_string(indent=0, repr_format=True)
 
     def to_string(self, indent: int = 0, repr_format: bool = True, extra_data: Optional[List[str]] = None) -> str:
         class_specific_data: List[str] = []
@@ -55,6 +44,12 @@ class AVLNode(Generic[KeyType, ValueType]):
             class_specific_data.extend(extra_data)
 
         return to_string(indent=indent, repr_format=repr_format, data=class_specific_data)
+
+    def __str__(self) -> str:
+        return self.to_string(indent=0, repr_format=False)
+
+    def __repr__(self) -> str:
+        return self.to_string(indent=0, repr_format=True)
 
     @property
     def key(self) -> KeyType:
@@ -93,8 +88,25 @@ class AVLTree(Generic[KeyType, ValueType]):
     def __init__(self) -> None:
         self.__root: Optional[AVLNode[KeyType, ValueType]] = None
 
+    def to_string(self, indent: int = 0, repr_format: bool = True, extra_data: Optional[List[str]] = None) -> str:
+        class_specific_data: List[str] = []
+        stringify: Callable[[object], str] = repr if repr_format else str  # type: ignore[assignment]
+        if repr_format:
+            class_specific_data.append(f"{type(self).__name__}(root={stringify(self.root)}")
+        else:
+            class_specific_data.append(f"{type(self).__name__}:")
+            class_specific_data.append(f"root={stringify(self.root)}")
+
+        if extra_data:
+            class_specific_data.extend(extra_data)
+
+        return to_string(indent=indent, repr_format=repr_format, data=class_specific_data)
+
+    def __str__(self) -> str:
+        return self.to_string(indent=0, repr_format=False)
+
     def __repr__(self) -> str:
-        return f"{type(self).__name__}(root={repr(self.__root)})"
+        return self.to_string(indent=0, repr_format=True)
 
     def find_max_value_less_than(self, key: KeyType) -> Optional[ValueType]:
         result: Optional[AVLNode[KeyType, ValueType]]
