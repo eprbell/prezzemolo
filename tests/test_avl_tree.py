@@ -28,83 +28,79 @@ class TestAVLTree(unittest.TestCase):
         values: List[int]
         expected_representation: str
         for values, expected_representation in [
-            ([10], "AVLTree(root=AVLNode(key=10, value=10, left=None, right=None, height=1))"),
-            ([10, 20], "AVLTree(root=AVLNode(key=10, value=10, left=None, right=AVLNode(key=20, value=20, left=None, right=None, height=1), height=2))"),
+            ([10], "AVLTree(root=AVLNode(key=10, value=10, height=1, left=None, right=None))"),
+            ([10, 20], "AVLTree(root=AVLNode(key=10, value=10, height=2, left=None, right=AVLNode(key=20, value=20, height=1, left=None, right=None)))"),
             (
                 [10, 20, 30],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [10, 30, 20],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [20, 10, 30],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [20, 30, 10],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [30, 10, 20],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [30, 20, 10],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [10, 20, 30, 40],
                 (
-                    "AVLTree(root=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, left=None, right=None, height=1), "
-                    "right=AVLNode(key=30, value=30, left=None, right=AVLNode(key=40, value=40, left=None, right=None, "
-                    "height=1), height=2), height=3))"
+                    "AVLTree(root=AVLNode(key=20, value=20, height=3, left=AVLNode(key=10, value=10, height=1, left=None, right=None), right=AVLNode(key=30, "
+                    "value=30, height=2, left=None, right=AVLNode(key=40, value=40, height=1, left=None, right=None))))"
                 ),
             ),
             (
                 [40, 30, 20, 10],
                 (
-                    "AVLTree(root=AVLNode(key=30, value=30, left=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, "
-                    "left=None, right=None, height=1), right=None, height=2), right=AVLNode(key=40, value=40, left=None, "
-                    "right=None, height=1), height=3))"
+                    "AVLTree(root=AVLNode(key=30, value=30, height=3, left=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, "
+                    "left=None, right=None), right=None), right=AVLNode(key=40, value=40, height=1, left=None, right=None)))"
                 ),
             ),
             (
                 [10, 20, 30, 40, 50, 60, 70],
                 (
-                    "AVLTree(root=AVLNode(key=40, value=40, left=AVLNode(key=20, value=20, left=AVLNode(key=10, value=10, "
-                    "left=None, right=None, height=1), right=AVLNode(key=30, value=30, left=None, right=None, height=1), height=2), "
-                    "right=AVLNode(key=60, value=60, left=AVLNode(key=50, value=50, left=None, right=None, height=1), "
-                    "right=AVLNode(key=70, value=70, left=None, right=None, height=1), height=2), height=3))"
+                    "AVLTree(root=AVLNode(key=40, value=40, height=3, left=AVLNode(key=20, value=20, height=2, left=AVLNode(key=10, value=10, height=1, "
+                    "left=None, right=None), right=AVLNode(key=30, value=30, height=1, left=None, right=None)), right=AVLNode(key=60, value=60, height=2, "
+                    "left=AVLNode(key=50, value=50, height=1, left=None, right=None), right=AVLNode(key=70, value=70, height=1, left=None, right=None))))"
                 ),
             ),
             (
                 [48, 13, 92, 99, 2, 12, 6, 57, 22],
                 (
-                    "AVLTree(root=AVLNode(key=48, value=48, left=AVLNode(key=12, value=12, left=AVLNode(key=2, value=2, "
-                    "left=None, right=AVLNode(key=6, value=6, left=None, right=None, height=1), height=2), "
-                    "right=AVLNode(key=13, value=13, left=None, right=AVLNode(key=22, value=22, left=None, right=None, height=1), "
-                    "height=2), height=3), right=AVLNode(key=92, value=92, left=AVLNode(key=57, value=57, left=None, right=None, height=1), "
-                    "right=AVLNode(key=99, value=99, left=None, right=None, height=1), height=2), height=4))"
+                    "AVLTree(root=AVLNode(key=48, value=48, height=4, left=AVLNode(key=12, value=12, height=3, left=AVLNode(key=2, value=2, height=2, "
+                    "left=None, right=AVLNode(key=6, value=6, height=1, left=None, right=None)), right=AVLNode(key=13, value=13, height=2, left=None, "
+                    "right=AVLNode(key=22, value=22, height=1, left=None, right=None))), right=AVLNode(key=92, value=92, height=2, left=AVLNode(key=57, "
+                    "value=57, height=1, left=None, right=None), right=AVLNode(key=99, value=99, height=1, left=None, right=None))))"
                 ),
             ),
         ]:
@@ -116,7 +112,7 @@ class TestAVLTree(unittest.TestCase):
         for value in values:
             tree.insert_node(value, value)
         if expected_representation:
-            self.assertEqual(str(tree), expected_representation, f"{str(tree)} != {expected_representation}")
+            self.assertEqual(repr(tree), expected_representation, f"{repr(tree)} != {expected_representation}")
         return tree
 
     def test_avl_tree_find(self) -> None:

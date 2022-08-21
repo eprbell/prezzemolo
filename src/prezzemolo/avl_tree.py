@@ -13,26 +13,72 @@
 # limitations under the License.
 
 
-from typing import Callable, Generic, List, Optional
+from datetime import datetime
+from decimal import Decimal
+from typing import Callable, Generic, List, Optional, TypeVar
 
-from prezzemolo.binary_tree import KeyType, Node, ValueType
+from prezzemolo.utility import to_string
+
+KeyType = TypeVar("KeyType", int, datetime, Decimal, float, str)  # pylint: disable=invalid-name
+ValueType = TypeVar("ValueType")  # pylint: disable=invalid-name
 
 
-class AVLNode(Node[KeyType, ValueType]):
+class AVLNode(Generic[KeyType, ValueType]):
     def __init__(self, key: KeyType, value: ValueType):
-        super().__init__(key=key, value=value)  # type: ignore
+        self.__key: KeyType = key
+        self.__value: ValueType = value
         self.__height: int = 1
+
+        self.__left: Optional[AVLNode[KeyType, ValueType]] = None
+        self.__right: Optional[AVLNode[KeyType, ValueType]] = None
+
+    def __str__(self) -> str:
+        return self.to_string(indent=0, repr_format=False)
+
+    def __repr__(self) -> str:
+        return self.to_string(indent=0, repr_format=True)
 
     def to_string(self, indent: int = 0, repr_format: bool = True, extra_data: Optional[List[str]] = None) -> str:
         class_specific_data: List[str] = []
         stringify: Callable[[object], str] = repr if repr_format else str  # type: ignore[assignment]
-
+        if repr_format:
+            class_specific_data.append(f"{type(self).__name__}(key={stringify(self.key)}")
+        else:
+            class_specific_data.append(f"{type(self).__name__}:")
+            class_specific_data.append(f"key={stringify(self.key)}")
+        class_specific_data.append(f"value={stringify(self.value)}")
         class_specific_data.append(f"height={stringify(self.height)}")
+        class_specific_data.append(f"left={stringify(self.left)}")
+        class_specific_data.append(f"right={stringify(self.right)}")
 
         if extra_data:
             class_specific_data.extend(extra_data)
 
-        return super().to_string(indent=indent, repr_format=repr_format, extra_data=class_specific_data)
+        return to_string(indent=indent, repr_format=repr_format, data=class_specific_data)
+
+    @property
+    def key(self) -> KeyType:
+        return self.__key
+
+    @property
+    def value(self) -> ValueType:
+        return self.__value
+
+    @property
+    def left(self) -> "Optional[AVLNode[KeyType, ValueType]]":
+        return self.__left
+
+    @left.setter
+    def left(self, node: "Optional[AVLNode[KeyType, ValueType]]") -> None:
+        self.__left = node
+
+    @property
+    def right(self) -> "Optional[AVLNode[KeyType, ValueType]]":
+        return self.__right
+
+    @right.setter
+    def right(self, node: "Optional[AVLNode[KeyType, ValueType]]") -> None:
+        self.__right = node
 
     @property
     def height(self) -> int:
@@ -69,13 +115,9 @@ class AVLTree(Generic[KeyType, ValueType]):
             current_key: KeyType = current_node.key
             try:
                 if current_key > key:
-                    if current_node.left and not isinstance(current_node.left, AVLNode):
-                        raise AssertionError(f"AVL tree contains a non-AVL node: {current_node.left}")
                     current_node = current_node.left
                 elif current_key < key:
                     result = current_node
-                    if current_node.right and not isinstance(current_node.right, AVLNode):
-                        raise AssertionError(f"AVL tree contains a non-AVL node: {current_node.right}")
                     current_node = current_node.right
                 elif current_key == key:
                     result = current_node
@@ -88,11 +130,6 @@ class AVLTree(Generic[KeyType, ValueType]):
         if not root:
             return AVLNode(key, value)
 
-        if root.left and not isinstance(root.left, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if root.right and not isinstance(root.right, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
-
         if key < root.key:
             root.left = self.insert_node_at_node(root.left, key, value)
         else:
@@ -104,27 +141,22 @@ class AVLTree(Generic[KeyType, ValueType]):
         if balance_factor > 1:
             # Disable mypy on the next few lines: it complains about root.left possibly being None (and therefore not having
             # attribute "key"). However since balance_factor is > 1 root.left is guaranteed not to be None.
-            if key < root.left.key:
+            if key < root.left.key:  # type: ignore
                 return self._rotate_right(root)
-            root.left = self._rotate_left(root.left)
+            root.left = self._rotate_left(root.left)  # type: ignore
             return self._rotate_right(root)
         if balance_factor < -1:
             # Disable mypy on the next few lines: it complains about root.right possibly being None (and therefore not having
             # attribute "key"). However since balance_factor is < -1 root.right is guaranteed not to be None.
             if key > root.right.key:  # type: ignore
                 return self._rotate_left(root)
-            root.right = self._rotate_right(root.right)
+            root.right = self._rotate_right(root.right)  # type: ignore
             return self._rotate_left(root)
 
         return root
 
     # Rotation implementation based on: https://en.wikipedia.org/wiki/Tree_rotation
     def _rotate_left(self, root: AVLNode[KeyType, ValueType]) -> AVLNode[KeyType, ValueType]:
-        if root.left and not isinstance(root.left, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if root.right and not isinstance(root.right, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
-
         # Disable mypy on the next few lines: it complains that variables possibly being None (and therefore not having accessible
         # attributes). However unless there is a bug, this should never occur.
         pivot: Optional[AVLNode[KeyType, ValueType]] = root.right
@@ -135,11 +167,6 @@ class AVLTree(Generic[KeyType, ValueType]):
         return pivot  # type: ignore
 
     def _rotate_right(self, root: AVLNode[KeyType, ValueType]) -> AVLNode[KeyType, ValueType]:
-        if root.left and not isinstance(root.left, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if root.right and not isinstance(root.right, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
-
         # Disable mypy on the next few lines: it complains that variables possibly being None (and therefore not having accessible
         # attributes). However unless there is a bug, this should never occur.
         pivot: Optional[AVLNode[KeyType, ValueType]] = root.left
@@ -154,10 +181,6 @@ class AVLTree(Generic[KeyType, ValueType]):
         return root.height if root else 0
 
     def _get_balance_factor(self, root: AVLNode[KeyType, ValueType]) -> int:
-        if root.left and not isinstance(root.left, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.left}")
-        if root.right and not isinstance(root.right, AVLNode):
-            raise AssertionError(f"AVL tree contains a non-AVL node: {root.right}")
         return self._get_height(root.left) - self._get_height(root.right) if root else 0
 
     @property
