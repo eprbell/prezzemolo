@@ -14,6 +14,9 @@
 
 # Prezzemolo Change Log
 
+## 0.0.2
+* Added py.typed
+
 ## 0.0.1
 * First version tracked in change log
 * implemented Graph and Vertex classes with respective unit tests
