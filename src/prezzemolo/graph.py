@@ -14,7 +14,8 @@
 
 
 from collections import deque
-from typing import Deque, Dict, Generic, Iterator, List, Optional, Set
+from heapq import heappop, heappush
+from typing import Deque, Dict, Generic, Iterator, List, Optional, Set, Tuple
 
 from prezzemolo.utility import ValueType
 from prezzemolo.vertex import Vertex
@@ -87,10 +88,53 @@ class Graph(Generic[ValueType]):
         # start and end are type checked inside _breadth_first_search()
         return self._breadth_first_search(start, end, vertex_2_parent=None)
 
+    def _dijkstra_search(
+        self, start: Vertex[ValueType], end: Optional[Vertex[ValueType]], vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]]
+    ) -> bool:
+        distances: Dict[Vertex[ValueType], float] = {v: float("inf") for v in self.__vertexes}
+        distances[start] = 0.0
+        priority_queue: List[Tuple[float, Vertex[ValueType]]] = [(0.0, start)]
+        predecessors: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {v: None for v in self.__vertexes}
+        if vertex_2_parent is not None:
+            vertex_2_parent[start] = None
+
+        while priority_queue:
+            current_distance: float
+            current_vertex: Vertex[ValueType]
+            (current_distance, current_vertex) = heappop(priority_queue)
+            if current_distance > distances[current_vertex]:
+                continue
+            for neighbor in current_vertex.neighbors:
+                new_distance = current_distance + current_vertex.get_weight(neighbor)
+                if vertex_2_parent is not None:
+                    vertex_2_parent[neighbor] = current_vertex
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    predecessors[neighbor] = current_vertex
+                    heappush(priority_queue, (new_distance, neighbor))
+            if current_vertex == end:
+                return True
+
+        return False
+
+    def dijkstra_search(self, start: Vertex[ValueType], end: Vertex[ValueType]) -> bool:
+        # start and end are type checked inside _dijkstra_search()
+        return self._dijkstra_search(start, end, vertex_2_parent=None)
+
     def find_shortest_path(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
         # start and end are type checked inside _breadth_first_search()
         vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {}
         if self._breadth_first_search(start, end, vertex_2_parent):
+            result = self._extract_path_from_parent_dictionary(end, vertex_2_parent)
+            if not reverse:
+                return reversed(result)
+            return iter(result)
+        return None
+
+    def find_dijkstra_shortest_path(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
+        # start and end are type checked inside _breadth_first_search()
+        vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {}
+        if self._dijkstra_search(start, end, vertex_2_parent):
             result = self._extract_path_from_parent_dictionary(end, vertex_2_parent)
             if not reverse:
                 return reversed(result)

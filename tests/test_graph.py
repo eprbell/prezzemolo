@@ -158,6 +158,27 @@ class TestGraph(unittest.TestCase):
         path = g1.find_shortest_path(v1, v3)
         self.assertIsNone(path)
 
+    def test_dijkstra_search(self) -> None:
+        v1 = Vertex[int](name="1")
+        v2 = Vertex[int](name="2")
+        v3 = Vertex[int](name="3")
+        v4 = Vertex[int](name="4")
+        v5 = Vertex[int](name="5")
+
+        v1.add_neighbor(v2, 5)
+        v1.add_neighbor(v3, 2)
+        v2.add_neighbor(v4, 4)
+        v2.add_neighbor(v5, 1)
+        v3.add_neighbor(v2, 1)
+        v3.add_neighbor(v4, 7)
+        v4.add_neighbor(v5, 3)
+
+        g1 = Graph[int]([v1, v2, v3, v4, v5])
+
+        path = g1.find_dijkstra_shortest_path(v1, v5)
+        assert path
+        self.assertEqual(list(path), [v5, v2, v3, v1])
+
 
 if __name__ == "__main__":
     logging.basicConfig(stream=sys.stderr)

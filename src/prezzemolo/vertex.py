@@ -14,9 +14,8 @@
 
 
 from typing import Callable, Dict, Generic, Iterator, List, Optional
-from prezzemolo.utility import ValueType
 
-from prezzemolo.utility import to_string
+from prezzemolo.utility import ValueType, to_string
 
 
 class Vertex(Generic[ValueType]):
