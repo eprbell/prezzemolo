@@ -15,6 +15,7 @@
 import logging
 import sys
 import unittest
+from typing import Dict, List, Tuple
 
 from prezzemolo.graph import Graph
 from prezzemolo.vertex import Vertex
@@ -159,25 +160,91 @@ class TestGraph(unittest.TestCase):
         self.assertIsNone(path)
 
     def test_dijkstra_search(self) -> None:
-        v1 = Vertex[int](name="1")
-        v2 = Vertex[int](name="2")
-        v3 = Vertex[int](name="3")
-        v4 = Vertex[int](name="4")
-        v5 = Vertex[int](name="5")
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph([5, 2, 4, 1, 1, 7, 3], [(0, 1), (0, 2), (1, 3), (1, 4), (2, 1), (2, 3), (3, 4)])
 
-        v1.add_neighbor(v2, 5)
-        v1.add_neighbor(v3, 2)
-        v2.add_neighbor(v4, 4)
-        v2.add_neighbor(v5, 1)
-        v3.add_neighbor(v2, 1)
-        v3.add_neighbor(v4, 7)
-        v4.add_neighbor(v5, 3)
+        g1 = Graph[int](list(test_vertexes.values()))
+        path = g1.find_weighted_shortest_path(test_vertexes[0], test_vertexes[4])
 
-        g1 = Graph[int]([v1, v2, v3, v4, v5])
-
-        path = g1.find_dijkstra_shortest_path(v1, v5)
         assert path
-        self.assertEqual(list(path), [v5, v2, v3, v1])
+        self.assertEqual(list(path), [test_vertexes[4], test_vertexes[1], test_vertexes[2], test_vertexes[0]])
+
+    def test_dijkstra_search_with_one_vertex(self) -> None:
+        v1 = Vertex[int](name="1")
+
+        g1 = Graph[int]([v1])
+        path = g1.find_weighted_shortest_path(v1, v1)
+
+        assert path
+        self.assertEqual(list(path), [v1])
+
+    def test_dijkstra_search_with_triangle_graph1(self) -> None:
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph([1, 2, 4], [(1, 2), (2, 3), (1, 3)])
+
+        g1 = Graph[int](list(test_vertexes.values()))
+        path = g1.find_weighted_shortest_path(test_vertexes[1], test_vertexes[3])
+
+        assert path
+        self.assertEqual(list(path), [test_vertexes[3], test_vertexes[2], test_vertexes[1]])
+
+    def test_dijkstra_search_with_triangle_graph2(self) -> None:
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph([1, 2, 2], [(1, 2), (2, 3), (1, 3)])
+
+        g1 = Graph[int](list(test_vertexes.values()))
+        path = g1.find_weighted_shortest_path(test_vertexes[1], test_vertexes[3])
+
+        assert path
+        self.assertEqual(list(path), [test_vertexes[3], test_vertexes[1]])
+
+    def test_dijkstra_search_with_triangle_graph3(self) -> None:
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph([1, 2, 3], [(1, 2), (2, 3), (1, 3)])
+
+        g1 = Graph[int](list(test_vertexes.values()))
+        path = g1.find_weighted_shortest_path(test_vertexes[1], test_vertexes[3])
+
+        assert path
+        self.assertEqual(list(path), [test_vertexes[3], test_vertexes[1]])
+
+    def test_dijkstra_search_with_cycle(self) -> None:
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph([1, 1, 1, 1, 1], [(1, 2), (2, 3), (3, 4), (4, 5), (5, 2)])
+
+        g1 = Graph[int](list(test_vertexes.values()))
+        path = g1.find_weighted_shortest_path(test_vertexes[1], test_vertexes[5])
+
+        assert path
+        self.assertEqual(list(path), [test_vertexes[5], test_vertexes[4], test_vertexes[3], test_vertexes[2], test_vertexes[1]])
+
+    def test_dijkstra_search_with_islands(self) -> None:
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph([1, 1, 1, 2, 2, 2], [(1, 2), (2, 3), (3, 1), (4, 5), (5, 6), (6, 4)])
+
+        g1 = Graph[int](list(test_vertexes.values()))
+        self.assertFalse(g1.dijkstra_search(test_vertexes[1], test_vertexes[4]))
+
+        path = g1.find_weighted_shortest_path(test_vertexes[1], test_vertexes[4])
+
+        self.assertIsNone(path)
+
+    def test_dijkstra_search_two_zones(self) -> None:
+        test_vertexes: Dict[int, Vertex[int]] = TestGraph._generate_graph(
+            [1, 2, 3, 1, 1, 1, 1, 2, 3, 1, 1, 1], [(1, 2), (1, 3), (1, 4), (2, 5), (3, 5), (4, 5), (5, 6), (5, 7), (5, 8), (6, 9), (7, 9), (8, 9)]
+        )
+
+        g1 = Graph[int](list(test_vertexes.values()))
+        path = g1.find_weighted_shortest_path(test_vertexes[1], test_vertexes[9])
+
+        assert path
+        self.assertEqual(list(path), [test_vertexes[9], test_vertexes[6], test_vertexes[5], test_vertexes[2], test_vertexes[1]])
+
+    @classmethod
+    def _generate_graph(cls, weights: List[int], edges: List[Tuple[int, int]]) -> Dict[int, Vertex[int]]:
+        vertexes: Dict[int, Vertex[int]] = {}
+        current_vertex: Vertex[int]
+
+        for i, edge in enumerate(edges):
+            current_vertex = vertexes.setdefault(edge[0], Vertex[int](name=str(edge[0]), data=int(edge[0])))
+            neighbor = vertexes.setdefault(edge[1], Vertex[int](name=str(edge[1]), data=int(edge[1])))
+            current_vertex.add_neighbor(neighbor, weights[i])
+
+        return vertexes
 
 
 if __name__ == "__main__":
