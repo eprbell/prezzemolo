@@ -86,3 +86,6 @@ class Vertex(Generic[ValueType]):
 
     def get_weight(self, neighbor: "Vertex[ValueType]") -> float:
         return self.__edge_weights[neighbor] if neighbor in self.__edge_weights else 0.0
+
+    def has_neighbor(self, neighbor: "Vertex[ValueType]") -> bool:
+        return neighbor in self.__neighbors
