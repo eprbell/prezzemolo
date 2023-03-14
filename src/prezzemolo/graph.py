@@ -14,11 +14,33 @@
 
 
 from collections import deque
-from heapq import heappop, heappush
-from typing import Deque, Dict, Generic, Iterator, List, Optional, Set, Tuple
+from dataclasses import dataclass
+from queue import PriorityQueue
+from typing import Deque, Dict, Generic, Iterator, List, Optional, Set
 
 from prezzemolo.utility import ValueType
 from prezzemolo.vertex import Vertex
+
+
+@dataclass(frozen=True)
+class _ShortestDistance(Generic[ValueType]):
+    distance: float
+    vertex: Vertex[ValueType]
+
+    # __lt__ and __gt__ are needed for PriorityQueue
+    def __lt__(self, other: object) -> bool:
+        if not other:
+            return False
+        if not isinstance(other, _ShortestDistance):
+            raise TypeError(f"Operand is not class _ShortestDistance: {repr(other)}")
+        return self.distance < other.distance
+
+    def __gt__(self, other: object) -> bool:
+        if not other:
+            return False
+        if not isinstance(other, _ShortestDistance):
+            raise TypeError(f"Operand is not class _ShortestDistance: {repr(other)}")
+        return self.distance > other.distance
 
 
 class Graph(Generic[ValueType]):
@@ -89,29 +111,32 @@ class Graph(Generic[ValueType]):
         return self._breadth_first_search(start, end, vertex_2_parent=None)
 
     def _dijkstra_search(
-        self, start: Vertex[ValueType], end: Optional[Vertex[ValueType]], vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]]
+        self, start: Vertex[ValueType], end: Optional[Vertex[ValueType]], vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]] = None
     ) -> bool:
-        distances: Dict[Vertex[ValueType], float] = {v: float("inf") for v in self.__vertexes}
-        distances[start] = 0.0
-        priority_queue: List[Tuple[float, Vertex[ValueType]]] = [(0.0, start)]
-        predecessors: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {v: None for v in self.__vertexes}
-        if vertex_2_parent is not None:
-            vertex_2_parent[start] = None
+        distance: Dict[Vertex[ValueType], float] = {v: float("inf") for v in self.__vertexes}
+        distance[start] = 0.0
+        remaining_vertexes: PriorityQueue[_ShortestDistance[ValueType]] = PriorityQueue()
+        remaining_vertexes.put(_ShortestDistance(distance=0.0, vertex=start))
+        visited: Set[Vertex[ValueType]] = set()
 
-        while priority_queue:
-            current_distance: float
-            current_vertex: Vertex[ValueType]
-            (current_distance, current_vertex) = heappop(priority_queue)
-            if current_distance > distances[current_vertex]:
+        while not remaining_vertexes.empty():
+            next_vertex: _ShortestDistance[ValueType] = remaining_vertexes.get()
+            current_distance: float = next_vertex.distance
+            current_vertex: Vertex[ValueType] = next_vertex.vertex
+
+            if current_vertex in visited:
                 continue
+
+            visited.add(current_vertex)
+
             for neighbor in current_vertex.neighbors:
-                new_distance = current_distance + current_vertex.get_weight(neighbor)
-                if vertex_2_parent is not None:
-                    vertex_2_parent[neighbor] = current_vertex
-                if new_distance < distances[neighbor]:
-                    distances[neighbor] = new_distance
-                    predecessors[neighbor] = current_vertex
-                    heappush(priority_queue, (new_distance, neighbor))
+                neighbor_distance = current_distance + current_vertex.get_weight(neighbor)
+                if neighbor_distance < distance[neighbor]:
+                    if vertex_2_parent is not None:
+                        vertex_2_parent[neighbor] = current_vertex
+                    distance[neighbor] = neighbor_distance
+                    remaining_vertexes.put(_ShortestDistance(distance=neighbor_distance, vertex=neighbor))
+
             if current_vertex == end:
                 return True
 
@@ -131,9 +156,9 @@ class Graph(Generic[ValueType]):
             return iter(result)
         return None
 
-    def find_dijkstra_shortest_path(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
-        # start and end are type checked inside _breadth_first_search()
-        vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {}
+    def find_weighted_shortest_path(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
+        # start and end are type checked inside _dijkstra_search()
+        vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {vertex: None for vertex in self.__vertexes}
         if self._dijkstra_search(start, end, vertex_2_parent):
             result = self._extract_path_from_parent_dictionary(end, vertex_2_parent)
             if not reverse:
