@@ -32,7 +32,7 @@ class _ShortestDistance(Generic[ValueType]):
         if not other:
             return False
         if not isinstance(other, _ShortestDistance):
-            raise TypeError(f"Operand is not class _ShortestDistance: {repr(other)}")
+            raise TypeError(f"Operand is not of class _ShortestDistance: {repr(other)}")
         return self.distance < other.distance
 
     def __gt__(self, other: object) -> bool:
