@@ -36,11 +36,7 @@ class _ShortestDistance(Generic[ValueType]):
         return self.distance < other.distance
 
     def __gt__(self, other: object) -> bool:
-        if not other:
-            return False
-        if not isinstance(other, _ShortestDistance):
-            raise TypeError(f"Operand is not class _ShortestDistance: {repr(other)}")
-        return self.distance > other.distance
+        return not self.__lt__(other)
 
 
 class Graph(Generic[ValueType]):
