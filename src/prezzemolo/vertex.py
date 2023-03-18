@@ -13,6 +13,7 @@
 # limitations under the License.
 
 
+from locale import LC_ALL, setlocale, strcoll
 from typing import Callable, Dict, Generic, Iterator, List, Optional
 
 from prezzemolo.utility import ValueType, to_string
@@ -54,6 +55,18 @@ class Vertex(Generic[ValueType]):
         if not isinstance(other, Vertex):
             raise TypeError(f"Operand has non-Vertex value: {repr(other)}")
         return self.name == other.name
+
+    def __lt__(self, other: object) -> bool:
+        if not other:
+            return False
+        if not isinstance(other, Vertex):
+            raise TypeError(f"Operand has non-Vertex value: {repr(other)}")
+        setlocale(LC_ALL, "en_US.utf8")
+
+        return bool(strcoll(self.name, other.name) < 0)
+
+    def __gt__(self, other: object) -> bool:
+        return not self.__lt__(other)
 
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)

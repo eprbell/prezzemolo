@@ -102,11 +102,11 @@ class Graph(Generic[ValueType]):
 
         return False
 
-    def breadth_first_search(self, start: Vertex[ValueType], end: Vertex[ValueType]) -> bool:
+    def are_connected(self, start: Vertex[ValueType], end: Vertex[ValueType]) -> bool:
         # start and end are type checked inside _breadth_first_search()
         return self._breadth_first_search(start, end, vertex_2_parent=None)
 
-    def _dijkstra_search(
+    def _dijkstra(
         self, start: Vertex[ValueType], end: Optional[Vertex[ValueType]], vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]] = None
     ) -> bool:
         distance: Dict[Vertex[ValueType], float] = {v: float("inf") for v in self.__vertexes}
@@ -114,11 +114,14 @@ class Graph(Generic[ValueType]):
         remaining_vertexes: PriorityQueue[_ShortestDistance[ValueType]] = PriorityQueue()
         remaining_vertexes.put(_ShortestDistance(distance=0.0, vertex=start))
         visited: Set[Vertex[ValueType]] = set()
+        if vertex_2_parent is not None:
+            for vertex in self.__vertexes:
+                vertex_2_parent[vertex] = None
 
         while not remaining_vertexes.empty():
-            next_vertex: _ShortestDistance[ValueType] = remaining_vertexes.get()
-            current_distance: float = next_vertex.distance
-            current_vertex: Vertex[ValueType] = next_vertex.vertex
+            shortest_distance: _ShortestDistance[ValueType] = remaining_vertexes.get()
+            current_distance: float = shortest_distance.distance
+            current_vertex: Vertex[ValueType] = shortest_distance.vertex
 
             if current_vertex in visited:
                 continue
@@ -138,11 +141,7 @@ class Graph(Generic[ValueType]):
 
         return False
 
-    def dijkstra_search(self, start: Vertex[ValueType], end: Vertex[ValueType]) -> bool:
-        # start and end are type checked inside _dijkstra_search()
-        return self._dijkstra_search(start, end, vertex_2_parent=None)
-
-    def find_shortest_path(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
+    def breadth_first_search(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
         # start and end are type checked inside _breadth_first_search()
         vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {}
         if self._breadth_first_search(start, end, vertex_2_parent):
@@ -152,10 +151,10 @@ class Graph(Generic[ValueType]):
             return iter(result)
         return None
 
-    def find_weighted_shortest_path(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
-        # start and end are type checked inside _dijkstra_search()
-        vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {vertex: None for vertex in self.__vertexes}
-        if self._dijkstra_search(start, end, vertex_2_parent):
+    def dijkstra(self, start: Vertex[ValueType], end: Vertex[ValueType], reverse: bool = True) -> Optional[Iterator[Vertex[ValueType]]]:
+        # start and end are type checked inside _dijkstra()
+        vertex_2_parent: Dict[Vertex[ValueType], Optional[Vertex[ValueType]]] = {}
+        if self._dijkstra(start, end, vertex_2_parent):
             result = self._extract_path_from_parent_dictionary(end, vertex_2_parent)
             if not reverse:
                 return reversed(result)
