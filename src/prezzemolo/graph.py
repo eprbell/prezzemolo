@@ -80,25 +80,25 @@ class Graph(Generic[ValueType]):
         end: Optional[Vertex[ValueType]],
         vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]] = None,
     ) -> bool:
-        marked_set: Set[Vertex[ValueType]] = set()
+        if self.__non_validated_vertexes:
+            raise ValueError(f"Some vertexes have neighbors that weren't added to the graph: {[v.name for v in self.__non_validated_vertexes]}")
         queue: Deque[Vertex[ValueType]] = deque()
         queue.append(start)
-        marked_set.add(start)
+        visited: Set[Vertex[ValueType]] = set()
+        visited.add(start)
         if vertex_2_parent is not None:
             vertex_2_parent[start] = None
 
         while len(queue) > 0:
-            vertex: Vertex[ValueType] = queue.popleft()
-            if vertex in self.__non_validated_vertexes and not self._validate_vertex(vertex):
-                raise ValueError(f"Vertex '{vertex.name}' has a neighbor that wasn't added to the graph")
-            for neighbor in vertex.neighbors:
-                if not neighbor in marked_set:
+            current_vertex: Vertex[ValueType] = queue.popleft()
+            if current_vertex == end:
+                return True
+            for neighbor in current_vertex.neighbors:
+                if not neighbor in visited:
                     queue.append(neighbor)
-                    marked_set.add(neighbor)
+                    visited.add(neighbor)
                     if vertex_2_parent is not None:
-                        vertex_2_parent[neighbor] = vertex
-                if neighbor == end:
-                    return True
+                        vertex_2_parent[neighbor] = current_vertex
 
         return False
 
@@ -109,14 +109,15 @@ class Graph(Generic[ValueType]):
     def _dijkstra(
         self, start: Vertex[ValueType], end: Optional[Vertex[ValueType]], vertex_2_parent: Optional[Dict[Vertex[ValueType], Optional[Vertex[ValueType]]]] = None
     ) -> bool:
+        if self.__non_validated_vertexes:
+            raise ValueError(f"Some vertexes have neighbors that weren't added to the graph: {[v.name for v in self.__non_validated_vertexes]}")
         distance: Dict[Vertex[ValueType], float] = {v: float("inf") for v in self.__vertexes}
         distance[start] = 0.0
         remaining_vertexes: PriorityQueue[_ShortestDistance[ValueType]] = PriorityQueue()
         remaining_vertexes.put(_ShortestDistance(distance=0.0, vertex=start))
         visited: Set[Vertex[ValueType]] = set()
         if vertex_2_parent is not None:
-            for vertex in self.__vertexes:
-                vertex_2_parent[vertex] = None
+            vertex_2_parent[start] = None
 
         while not remaining_vertexes.empty():
             shortest_distance: _ShortestDistance[ValueType] = remaining_vertexes.get()
@@ -125,19 +126,18 @@ class Graph(Generic[ValueType]):
 
             if current_vertex in visited:
                 continue
+            if current_vertex == end:
+                return True
 
             visited.add(current_vertex)
 
             for neighbor in current_vertex.neighbors:
                 neighbor_distance = current_distance + current_vertex.get_weight(neighbor)
                 if neighbor_distance < distance[neighbor]:
-                    if vertex_2_parent is not None:
-                        vertex_2_parent[neighbor] = current_vertex
                     distance[neighbor] = neighbor_distance
                     remaining_vertexes.put(_ShortestDistance(distance=neighbor_distance, vertex=neighbor))
-
-            if current_vertex == end:
-                return True
+                    if vertex_2_parent is not None:
+                        vertex_2_parent[neighbor] = current_vertex
 
         return False
 
