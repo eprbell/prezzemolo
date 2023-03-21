@@ -12,7 +12,7 @@
 <!--- See the License for the specific language governing permissions and --->
 <!--- limitations under the License. --->
 
-# Prezzemolo v0.0.3
+# Prezzemolo v0.0.4
 [![Static Analysis / Main Branch](https://github.com/eprbell/prezzemolo/actions/workflows/static_analysis.yml/badge.svg)](https://github.com/eprbell/prezzemolo/actions/workflows/static_analysis.yml)
 [![Documentation Check / Main Branch](https://github.com/eprbell/prezzemolo/actions/workflows/documentation_check.yml/badge.svg)](https://github.com/eprbell/prezzemolo/actions/workflows/documentation_check.yml)
 [![Unix Unit Tests / Main Branch](https://github.com/eprbell/prezzemolo/actions/workflows/unix_unit_tests.yml/badge.svg)](https://github.com/eprbell/prezzemolo/actions/workflows/unix_unit_tests.yml)
