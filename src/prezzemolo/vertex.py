@@ -14,9 +14,8 @@
 
 
 from typing import Callable, Dict, Generic, Iterator, List, Optional
-from prezzemolo.utility import ValueType
 
-from prezzemolo.utility import to_string
+from prezzemolo.utility import ValueType, to_string
 
 
 class Vertex(Generic[ValueType]):
@@ -56,6 +55,17 @@ class Vertex(Generic[ValueType]):
             raise TypeError(f"Operand has non-Vertex value: {repr(other)}")
         return self.name == other.name
 
+    def __lt__(self, other: object) -> bool:
+        if not other:
+            return False
+        if not isinstance(other, Vertex):
+            raise TypeError(f"Operand has non-Vertex value: {repr(other)}")
+
+        return self.name < other.name
+
+    def __gt__(self, other: object) -> bool:
+        return not self.__lt__(other)
+
     def __ne__(self, other: object) -> bool:
         return not self.__eq__(other)
 
@@ -87,3 +97,6 @@ class Vertex(Generic[ValueType]):
 
     def get_weight(self, neighbor: "Vertex[ValueType]") -> float:
         return self.__edge_weights[neighbor] if neighbor in self.__edge_weights else 0.0
+
+    def has_neighbor(self, neighbor: "Vertex[ValueType]") -> bool:
+        return neighbor in self.__neighbors
