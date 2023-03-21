@@ -14,6 +14,9 @@
 
 # Prezzemolo Change Log
 
+## 0.0.4
+* Added Dijkstra to Graph class
+
 ## 0.0.3
 * Manage py.typed to setup.cfg options.package_data
 
