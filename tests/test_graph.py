@@ -40,7 +40,7 @@ class TestGraph(unittest.TestCase):
             ]
         )
         graph.add_vertex(Vertex[int](name="7", data=7))
-        vertexes: Dict[int, Vertex[int]] = {int(v.name):v for v in graph.vertexes}
+        vertexes: Dict[int, Vertex[int]] = {int(v.name): v for v in graph.vertexes}
 
         self.assertFalse(graph.are_connected(vertexes[2], vertexes[7]))
         self.assertFalse(graph.are_connected(vertexes[2], vertexes[1]))
@@ -84,7 +84,7 @@ class TestGraph(unittest.TestCase):
                 (11, 10, 0),
             ]
         )
-        vertexes: Dict[int, Vertex[int]] = {int(v.name):v for v in graph.vertexes}
+        vertexes: Dict[int, Vertex[int]] = {int(v.name): v for v in graph.vertexes}
 
         self.assertFalse(graph.are_connected(vertexes[11], vertexes[1]))
         self.assertTrue(graph.are_connected(vertexes[1], vertexes[8]))
@@ -293,7 +293,7 @@ class TestGraph(unittest.TestCase):
                 ("h", "g", 2),
             ]
         )
-        vertexes: Dict[str, Vertex[str]] = {v.name:v for v in graph.vertexes}
+        vertexes: Dict[str, Vertex[str]] = {v.name: v for v in graph.vertexes}
 
         self.assertTrue(graph.are_connected(vertexes["a"], vertexes["i"]))
         path = graph.dijkstra(vertexes["a"], vertexes["i"], reverse=False)
